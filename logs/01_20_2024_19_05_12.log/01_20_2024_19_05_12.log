@@ -1,0 +1,10 @@
+[ 2024-01-20 19:05:13,250 ] 22 root - INFO - Data Read Succesfully from data\dataset_small.csv
+[ 2024-01-20 19:05:13,250 ] 23 root - INFO - Initiating Data Ingestion Method
+[ 2024-01-20 19:05:15,193 ] 26 root - INFO - Data Ingestion Method Completed
+[ 2024-01-20 19:05:15,670 ] 28 root - INFO - Clean Data Saved to artifacts/cleaned_data/final_data.csv
+[ 2024-01-20 19:05:15,971 ] 36 root - INFO - Training Dataset Saved at artifacts/cleaned_data/train_data.csv
+[ 2024-01-20 19:05:16,093 ] 40 root - INFO - Testing Dataset Saved at artifacts/cleaned_data/test_data.csv
+[ 2024-01-20 19:05:16,093 ] 41 root - INFO - Completed Data Ingestion Method
+[ 2024-01-20 19:05:16,102 ] 24 root - INFO - Initiating Data Preprocessing
+[ 2024-01-20 19:05:16,313 ] 33 root - INFO - Standardization Process Completed and Saved at artifacts/components/standard.joblib
+[ 2024-01-20 19:05:16,637 ] 40 root - INFO - PCA Process Completed

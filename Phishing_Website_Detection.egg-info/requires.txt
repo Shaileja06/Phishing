@@ -1,0 +1,5 @@
+numpy
+pandas
+python-whois
+scikit-learn
+streamlit

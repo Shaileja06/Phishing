@@ -1,0 +1,12 @@
+[ 2024-01-20 19:10:03,488 ] 22 root - INFO - Data Read Succesfully from data\dataset_small.csv
+[ 2024-01-20 19:10:03,488 ] 23 root - INFO - Initiating Data Ingestion Method
+[ 2024-01-20 19:10:05,169 ] 26 root - INFO - Data Ingestion Method Completed
+[ 2024-01-20 19:10:05,566 ] 28 root - INFO - Clean Data Saved to artifacts/cleaned_data/final_data.csv
+[ 2024-01-20 19:10:05,900 ] 36 root - INFO - Training Dataset Saved at artifacts/cleaned_data/train_data.csv
+[ 2024-01-20 19:10:05,998 ] 40 root - INFO - Testing Dataset Saved at artifacts/cleaned_data/test_data.csv
+[ 2024-01-20 19:10:05,998 ] 41 root - INFO - Completed Data Ingestion Method
+[ 2024-01-20 19:10:06,024 ] 24 root - INFO - Initiating Data Preprocessing
+[ 2024-01-20 19:10:06,231 ] 33 root - INFO - Standardization Process Completed and Saved at artifacts/components/standard.joblib
+[ 2024-01-20 19:10:06,572 ] 40 root - INFO - PCA Process Completed
+[ 2024-01-20 19:10:06,573 ] 28 root - INFO - Model Training Initiated
+[ 2024-01-20 19:10:11,780 ] 35 root - ERROR - Error during model training: There was an error in the TPOT optimization process. This could be because the data was not formatted properly, or because data for a regression problem was provided to the TPOTClassifier object. Please make sure you passed the data to TPOT correctly. If you enabled PyTorch estimators, please check the data requirements in the online documentation: https://epistasislab.github.io/tpot/using/

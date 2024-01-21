@@ -61,8 +61,10 @@ if __name__=='__main__':
     print(dir['test_data'])    
 
     preprocess_process = Preprocessing(dir['train_data'],dir['test_data']) 
-    X, y, standar_scalar_dir, pca_dir = preprocess_process.preprocessing()
+    data = preprocess_process.preprocessing()
+    print(data['standar_scalar_dir'])
+    print(data['pca_dir'])
 
-    model_training_process = Model_Training(X, y, standar_scalar_dir, pca_dir,dir['test_data'])
+    model_training_process = Model_Training(data['X'],data['y'],data['standar_scalar_dir'],data['pca_dir'],dir['test_data'])
     model_dir = model_training_process.start_training()
     print(model_dir)

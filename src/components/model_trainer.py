@@ -16,44 +16,25 @@ class Model_Training_files_dir():
 
 
 class Model_Training():
-    def __init__(self,X,y,standar_scalar_dir,pca_dir,test_data):
+    def __init__(self, X, y, standar_scalar_dir, pca_dir, test_data):
+        logging.info(f'{X.shape} {y.shape}')
+        logging.info(f'{X}')
         self.X = X
-        self.y = y
+        self.y = y 
         self.standar_scalar_dir = standar_scalar_dir
         self.pca_dir = pca_dir
         self.test_data = test_data
         self.dir = Model_Training_files_dir()
-        
+
     def start_training(self):
         logging.info('Model Training Initiated')
-        
-        try:
-            #tpot = train_model(self.X, self.y)
-            tpot_config = {
-                'xgboost.XGBClassifier': {
-                    'learning_rate': [0.01, 0.1, 0.2, 0.3],
-                    'n_estimators': range(50, 500),
-                    'max_depth': range(3, 10),
-                    'subsample': [0.8, 0.9, 1.0],
-                    'colsample_bytree': [0.8, 0.9, 1.0],
-                    'gamma': [0, 0.1, 0.2, 0.3, 0.4],
-                    'min_child_weight': range(1, 10)
-                }
-            }
+        dir2 = train_model(self.X,self.y,self.dir.model_train_dir)
 
-            tpot = TPOTClassifier(generations=5, population_size=20, config_dict=tpot_config, verbosity=2, random_state=42, scoring='accuracy')
-            tpot.fit(self.X, self.y)
-            # Saving the trained TPOT classifier to a file in .joblib
-            joblib.dump(tpot.fitted_pipeline_, self.dir.model_train_dir)
-            logging.info('Model Training Completed')
-
-        except Exception as e:
-            logging.error(f"Error during model training: {e}")
-            return None  # Return None or handle the error as needed
+        logging.info('Model Training Completed')
 
         # Test Data Load and Processing
         xt, yt = data_split(self.test_data)
-        logging.info(f'Test Data Loaded Succesfully')
+        logging.info(f'Test Data Loaded Successfully')
 
         # Load scaler and pca models
         scaler = joblib.load(self.standar_scalar_dir)
@@ -65,12 +46,12 @@ class Model_Training():
         xt = pca.transform(xt)
 
         # Load tpot model
-        #tpot = joblib.load(self.dir.model_train_dir)
+        tpot = joblib.load(dir2)
 
         accuracy = tpot.score(xt, yt)
         logging.info(f"Test Accuracy: {accuracy}")
 
-        return self.dir.model_train_dir
+        return self.dir.model_train_dir 
     
 if __name__=='__main__':
     ingestion_process = Ingestion('data\dataset_small.csv')
@@ -80,10 +61,8 @@ if __name__=='__main__':
     print(dir['test_data'])    
 
     preprocess_process = Preprocessing(dir['train_data'],dir['test_data']) 
-    data = preprocess_process.preprocessing()
-    print(data['standar_scalar_dir'])
-    print(data['pca_dir'])
+    X, y, standar_scalar_dir, pca_dir = preprocess_process.preprocessing()
 
-    model_training_process = Model_Training(data['X'],data['y'],data['standar_scalar_dir'],data['pca_dir'],dir['test_data'])
+    model_training_process = Model_Training(X, y, standar_scalar_dir, pca_dir,dir['test_data'])
     model_dir = model_training_process.start_training()
     print(model_dir)

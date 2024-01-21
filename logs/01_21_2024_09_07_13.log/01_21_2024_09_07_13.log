@@ -1,0 +1,25 @@
+[ 2024-01-21 09:07:13,648 ] 22 root - INFO - Data Read Succesfully from data\dataset_small.csv
+[ 2024-01-21 09:07:13,649 ] 23 root - INFO - Initiating Data Ingestion Method
+[ 2024-01-21 09:07:15,213 ] 26 root - INFO - Data Ingestion Method Completed
+[ 2024-01-21 09:07:15,645 ] 28 root - INFO - Clean Data Saved to artifacts/cleaned_data/final_data.csv
+[ 2024-01-21 09:07:15,973 ] 36 root - INFO - Training Dataset Saved at artifacts/cleaned_data/train_data.csv
+[ 2024-01-21 09:07:16,077 ] 40 root - INFO - Testing Dataset Saved at artifacts/cleaned_data/test_data.csv
+[ 2024-01-21 09:07:16,078 ] 41 root - INFO - Completed Data Ingestion Method
+[ 2024-01-21 09:07:16,103 ] 26 root - INFO - Initiating Data Preprocessing
+[ 2024-01-21 09:07:16,268 ] 35 root - INFO - Standardization Process Completed and Saved at artifacts/components/standard.joblib
+[ 2024-01-21 09:07:16,547 ] 42 root - INFO - PCA Process Completed
+[ 2024-01-21 09:07:16,547 ] 20 root - INFO - (43983, 20) (43983,)
+[ 2024-01-21 09:07:16,548 ] 21 root - INFO - [[-0.51337644  0.96898473 -0.04395437 ... -0.42757623  0.29611671
+  -0.0984944 ]
+ [-0.1226351   1.01934484 -0.13165707 ...  0.53633212  0.22625917
+   0.17332462]
+ [ 0.73518948  2.1170376  -0.15345564 ... -0.12116613  0.55887008
+  -0.13899195]
+ ...
+ [ 1.06287529  2.0211162   0.13185322 ... -0.24056311 -0.34815219
+   0.22903761]
+ [-1.0013786   0.59084684 -0.06191088 ... -0.26807964  0.17244167
+   0.10284445]
+ [-2.30703219 -1.53453906  0.19196821 ...  0.02478014  0.08379593
+   0.01181958]]
+[ 2024-01-21 09:07:16,548 ] 30 root - INFO - Model Training Initiated

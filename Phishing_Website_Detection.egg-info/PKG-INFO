@@ -9,3 +9,7 @@ Requires-Dist: pandas
 Requires-Dist: python-whois
 Requires-Dist: scikit-learn
 Requires-Dist: streamlit
+Requires-Dist: xgboost
+Requires-Dist: tensorflow
+Requires-Dist: torch
+Requires-Dist: tpot

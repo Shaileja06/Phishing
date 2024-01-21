@@ -3,3 +3,7 @@ pandas
 python-whois
 scikit-learn
 streamlit
+xgboost
+tensorflow
+torch
+tpot

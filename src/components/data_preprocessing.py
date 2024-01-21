@@ -3,10 +3,12 @@ from sklearn.decomposition import PCA
 import os
 import joblib
 from dataclasses import dataclass
+#from src.utils.ingestion_utils import concat_x_y
 from src.utils.preprocessing_utils import data_split
 from src.logger import logging
 from src.exception import CustomException
 from src.components.data_ingestion import Ingestion
+import pandas as pd
 
 @dataclass
 class Preprocessing_files_dir():
@@ -38,13 +40,13 @@ class Preprocessing():
         with open(self.dir.pca_dir,'wb') as f:
             joblib.dump(pca,f)
         logging.info('PCA Process Completed')
-
-        return {
+        return X,y,self.dir.standar_scalar_dir,self.dir.pca_dir
+        '''return {
             'X':X,
             'y':y,
             'standar_scalar_dir':self.dir.standar_scalar_dir,
             'pca_dir':self.dir.pca_dir
-        }
+        }'''
 
 
 if __name__=='__main__':
@@ -56,11 +58,11 @@ if __name__=='__main__':
 
     preprocess_process = Preprocessing(dir['train_data'],dir['test_data']) 
     data = preprocess_process.preprocessing()
-    print(data['standar_scalar_dir'])
+    ''' print(data['standar_scalar_dir'])
     print(data['pca_dir'])
     print(data['X'])
-    print(data['y'].values)
+    print(data['y'])'''
 
-    print(data['X'].shape,data['y'].shape,len(data['y']))
+    #print(data['X'].shape,data['y'].shape,len(data['y']))
 
 

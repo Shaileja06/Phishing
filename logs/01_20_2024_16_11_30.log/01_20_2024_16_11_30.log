@@ -1,8 +1,0 @@
-[ 2024-01-20 16:11:31,330 ] 22 root - INFO - Data Read Succesfully from data\dataset_small.csv
-[ 2024-01-20 16:11:31,330 ] 23 root - INFO - Initiating Data Ingestion Method
-[ 2024-01-20 16:11:33,077 ] 26 root - INFO - Data Ingestion Method Completed
-[ 2024-01-20 16:11:33,541 ] 28 root - INFO - Clean Data Saved to artifacts/cleaned_data/final_data.csv
-[ 2024-01-20 16:11:33,898 ] 36 root - INFO - Training Dataset Saved at artifacts/cleaned_data/train_data.csv
-[ 2024-01-20 16:11:34,134 ] 40 root - INFO - Testing Dataset Saved at artifacts/cleaned_data/test_data.csv
-[ 2024-01-20 16:11:34,134 ] 41 root - INFO - Completed Data Ingestion Method
-[ 2024-01-20 16:11:34,162 ] 24 root - INFO - Initiating Data Preprocessing

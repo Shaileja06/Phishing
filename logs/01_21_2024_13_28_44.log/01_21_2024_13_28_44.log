@@ -1,0 +1,24 @@
+[ 2024-01-21 13:28:45,352 ] 22 root - INFO - Data Read Succesfully from /content/Phishing/data/dataset_full.csv
+[ 2024-01-21 13:28:45,352 ] 23 root - INFO - Initiating Data Ingestion Method
+[ 2024-01-21 13:28:48,895 ] 26 root - INFO - Data Ingestion Method Completed
+[ 2024-01-21 13:28:49,432 ] 29 root - INFO - Clean Data Saved to artifacts/cleaned_data/final_data.csv
+[ 2024-01-21 13:28:49,874 ] 37 root - INFO - Training Dataset Saved at artifacts/cleaned_data/train_data.csv
+[ 2024-01-21 13:28:50,012 ] 41 root - INFO - Testing Dataset Saved at artifacts/cleaned_data/test_data.csv
+[ 2024-01-21 13:28:50,012 ] 42 root - INFO - Completed Data Ingestion Method
+[ 2024-01-21 13:28:50,013 ] 26 root - INFO - Initiating Data Preprocessing
+[ 2024-01-21 13:28:50,185 ] 35 root - INFO - Standardization Process Completed and Saved at artifacts/components/standard.joblib
+[ 2024-01-21 13:28:50,912 ] 42 root - INFO - PCA Process Completed
+[ 2024-01-21 13:28:50,913 ] 20 root - INFO - (66485, 20) (66485,)
+[ 2024-01-21 13:28:50,914 ] 21 root - INFO - [[ 3.68838556  4.0511772  -1.31033015 ... -0.91803081  2.71267965
+  -3.99118559]
+ [-1.48228761 -0.71909798  0.40247955 ...  0.00705244 -0.20578252
+   0.06881642]
+ [-1.48872829 -0.71995903  0.40304117 ...  0.00750528 -0.20440249
+   0.07118145]
+ ...
+ [ 2.17681282  3.07888094 -1.86233068 ...  0.43860652  0.31944954
+   0.60217267]
+ [-1.55270363 -0.76370612  0.44461584 ... -0.07242524 -0.44306842
+   0.66558446]
+ [-1.50472213 -0.73089581  0.41343484 ... -0.01247735 -0.26406897
+   0.2197822 ]]

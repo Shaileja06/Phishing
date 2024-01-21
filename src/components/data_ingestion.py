@@ -24,7 +24,8 @@ class Ingestion():
         clean = DataCleaning(df, 0.8, 0.8)
         df = clean.feature_scaling_df()
         logging.info(f'Data Ingestion Method Completed')
-        df.to_csv(self.dir.cleaned_data)
+        df.to_csv(self.dir.cleaned_data,index=False)
+
         logging.info(f'Clean Data Saved to {self.dir.cleaned_data}')
 
         X = df.drop(columns='phishing',axis=1)
@@ -32,11 +33,11 @@ class Ingestion():
 
         X_train, X_test, y_train, y_test = train_test_split(X ,y, test_size=0.25, random_state=42)
         train_df = concat_x_y(X_train,y_train)
-        train_df.to_csv(self.dir.train_data)
+        train_df.to_csv(self.dir.train_data,index=False)
         logging.info(f'Training Dataset Saved at {self.dir.train_data}')
 
         test_df = concat_x_y(X_test,y_test)
-        test_df.to_csv(self.dir.test_data)
+        test_df.to_csv(self.dir.test_data,index=False)
         logging.info(f'Testing Dataset Saved at {self.dir.test_data}')
         logging.info('Completed Data Ingestion Method')
         return {

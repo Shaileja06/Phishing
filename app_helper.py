@@ -9,7 +9,6 @@ def extract_additional_url_features(url):
 
     # Extracting features based on characters in the URL
     char_count_features = {
-        'Unnamed':0,
         'qty_dot_url': url.count('.'),
         'qty_hyphen_url': url.count('-'),
         'qty_underline_url': url.count('_'),

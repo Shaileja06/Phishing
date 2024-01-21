@@ -27,34 +27,34 @@ class Model_Training():
         self.dir = Model_Training_files_dir()
 
     def start_training(self):
-        logging.info('Model Training Initiated')
+        print('Model Training Initiated')
         dir2 = train_model(self.X,self.y,self.dir.model_train_dir)
 
-        logging.info('Model Training Completed')
+        print('Model Training Completed')
 
         # Test Data Load and Processing
         xt, yt = data_split(self.test_data)
-        logging.info(f'Test Data Loaded Successfully')
+        print(f'Test Data Loaded Successfully')
 
         # Load scaler and pca models
         scaler = joblib.load(self.standar_scalar_dir)
-        logging.info(f'Standardization Model loaded Successfully')
+        print(f'Standardization Model loaded Successfully')
         xt = scaler.transform(xt)
 
         pca = joblib.load(self.pca_dir)
-        logging.info(f'PCA Model loaded Successfully')
+        print(f'PCA Model loaded Successfully')
         xt = pca.transform(xt)
 
         # Load tpot model
         tpot = joblib.load(dir2)
 
         accuracy = tpot.score(xt, yt)
-        logging.info(f"Test Accuracy: {accuracy}")
+        print(f"Test Accuracy: {accuracy}")
 
         return self.dir.model_train_dir 
     
 if __name__=='__main__':
-    ingestion_process = Ingestion('/content/Phisihing-Url-Checker/data/dataset_small.csv')
+    ingestion_process = Ingestion('/content/Phishing/data/dataset_full.csv')
     dir = ingestion_process.ingestion()
     print(dir['cleaned_data'])
     print(dir['train_data'])

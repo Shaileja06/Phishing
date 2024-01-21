@@ -50,7 +50,7 @@ class Preprocessing():
 
 
 if __name__=='__main__':
-    ingestion_process = Ingestion('/content/Phisihing-Url-Checker/data/dataset_small.csv')
+    ingestion_process = Ingestion('/content/Phishing/data/dataset_full.csv')
     dir = ingestion_process.ingestion()
     print(dir['cleaned_data'])
     print(dir['train_data'])

@@ -13,7 +13,7 @@ class Ingestion_files_dir():
     test_data = 'artifacts/cleaned_data/test_data.csv'
 
 class Ingestion():
-    def __init__(self, file='data\dataset_small.csv'):
+    def __init__(self, file='/content/Phisihing-Url-Checker/data/dataset_small.csv'):
         self.file = file
         self.dir = Ingestion_files_dir()
 
@@ -46,7 +46,7 @@ class Ingestion():
         }
                 
 if __name__=='__main__':
-    ingestion_process = Ingestion('data\dataset_small.csv')
+    ingestion_process = Ingestion('/content/Phisihing-Url-Checker/data/dataset_small.csv')
     dir = ingestion_process.ingestion()
     print(dir['cleaned_data'])
     print(dir['train_data'])

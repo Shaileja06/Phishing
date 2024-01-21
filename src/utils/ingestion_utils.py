@@ -21,7 +21,6 @@ class DataCleaning:
             'qty_nameservers',
             'qty_mx_servers',
             'ttl_hostname',
-            'tls_ssl_certificate',
             'qty_redirects',
             'url_google_index',
             'domain_google_index',

@@ -180,18 +180,18 @@ def prediction(extracted_features):
     print(extracted_features.values(),len(extracted_features.values()))
     data = np.array(list(extracted_features.values())).reshape(1, -1)
 
-    # Assuming you have a scaler object
-    scaler = joblib.load('artifacts\components\standard.joblib')
-    scaled_data = scaler.transform(data)
-
     # Assuming you have a PCA object
     pca = joblib.load('artifacts\components\pca.joblib')
-    pca_transformed_data = pca.transform(scaled_data)
+    pca_transformed_data = pca.transform(data)
+
+    # Assuming you have a scaler object
+    scaler = joblib.load('artifacts\components\standard.joblib')
+    scaled_data = scaler.transform(pca_transformed_data)
 
     # Use the trained XGBBoost for prediction
     #prediction = loaded_pipeline.predict(pca_transformed_data)
     tpot = joblib.load('artifacts\model\model.joblib')
-    prediction = tpot.predict(pca_transformed_data)
+    prediction = tpot.predict(scaled_data)
 
     print(prediction)
     return prediction

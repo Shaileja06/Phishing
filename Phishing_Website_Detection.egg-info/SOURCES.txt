@@ -20,6 +20,7 @@ src/entity/__init__.py
 src/entity/artifacts_entity.py
 src/entity/config_entity.py
 src/pipeline/__init__.py
+src/pipeline/prediction_pipeline.py
 src/pipeline/training_pipeline.py
 src/utils/__init__.py
 src/utils/ingestion_utils.py

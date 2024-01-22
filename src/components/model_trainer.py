@@ -37,13 +37,13 @@ class Model_Training():
         print(f'Test Data Loaded Successfully')
 
         # Load scaler and pca models
-        scaler = joblib.load(self.standar_scalar_dir)
-        print(f'Standardization Model loaded Successfully')
-        xt = scaler.transform(xt)
-
         pca = joblib.load(self.pca_dir)
         print(f'PCA Model loaded Successfully')
         xt = pca.transform(xt)
+
+        scaler = joblib.load(self.standar_scalar_dir)
+        print(f'Standardization Model loaded Successfully')
+        xt = scaler.transform(xt)
 
         # Load tpot model
         tpot = joblib.load(dir2)

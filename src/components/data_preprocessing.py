@@ -27,19 +27,19 @@ class Preprocessing():
         #  Train data spliting to X,y
         X,y = data_split(self.train_data)
 
+        # PCA of the features
+        pca = PCA(n_components=10)
+        X = pca.fit_transform(X)
+        with open(self.dir.pca_dir,'wb') as f:
+            joblib.dump(pca,f)
+        logging.info('PCA Process Completed')
+
         # Standarization of the features
         scaler = StandardScaler()
         X = scaler.fit_transform(X)
         with open(self.dir.standar_scalar_dir,'wb') as f:
             joblib.dump(scaler,f)
         logging.info(f'Standardization Process Completed and Saved at {self.dir.standar_scalar_dir}')
-
-        # PCA of the features
-        pca = PCA(n_components=20)
-        X = pca.fit_transform(X)
-        with open(self.dir.pca_dir,'wb') as f:
-            joblib.dump(pca,f)
-        logging.info('PCA Process Completed')
         
         return {
             'X':X,

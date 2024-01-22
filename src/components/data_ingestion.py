@@ -4,6 +4,7 @@ import pandas as pd
 import os
 from src.utils.ingestion_utils import DataCleaning,concat_x_y
 from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE
 
 @dataclass
 class Ingestion_files_dir():
@@ -23,13 +24,17 @@ class Ingestion():
         logging.info('Initiating Data Ingestion Method')
         clean = DataCleaning(df, 0.8, 0.8)
         df = clean.feature_scaling_df()
-        logging.info(f'Data Ingestion Method Completed')
-        df.to_csv(self.dir.cleaned_data,index=False)
-
-        logging.info(f'Clean Data Saved to {self.dir.cleaned_data}')
 
         X = df.drop(columns='phishing',axis=1)
         y = df['phishing']
+
+        smote = SMOTE(sampling_strategy='all', k_neighbors=5)
+        X, y = smote.fit_resample(X,y)
+
+        df = concat_x_y(X,y)
+        df.to_csv(self.dir.cleaned_data,index=False)
+
+        logging.info(f'Clean Data Saved to {self.dir.cleaned_data}')
 
         X_train, X_test, y_train, y_test = train_test_split(X ,y, test_size=0.25, random_state=42)
         train_df = concat_x_y(X_train,y_train)

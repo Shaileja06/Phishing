@@ -7,4 +7,5 @@ xgboost
 tensorflow
 torch
 tpot
+imblearn
 -e .

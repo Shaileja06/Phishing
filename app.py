@@ -1,5 +1,5 @@
 import streamlit as st
-from app_helper import extract_all_features,prediction
+from src.pipeline.prediction_pipeline import extract_all_features,prediction
 
 def main():
     st.title("Phished Url Detector")

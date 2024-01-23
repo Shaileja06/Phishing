@@ -32,6 +32,7 @@ class Ingestion():
         X, y = smote.fit_resample(X,y)
 
         df = concat_x_y(X,y)
+        logging.info(f"Smoting Completed Succesfully The Vale counts are {df['phishing'].value_counts()}")
         df.to_csv(self.dir.cleaned_data,index=False)
 
         logging.info(f'Clean Data Saved to {self.dir.cleaned_data}')

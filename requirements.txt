@@ -6,6 +6,6 @@ streamlit
 xgboost
 tensorflow
 torch
-tpot
+hyperopt
 imblearn
 -e .

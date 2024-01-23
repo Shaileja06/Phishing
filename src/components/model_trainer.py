@@ -1,13 +1,14 @@
 from dataclasses import dataclass
-from tpot import TPOTClassifier
 import os
 import joblib
 from src.utils.preprocessing_utils import data_split
 from src.logger import logging
-from src.exception import CustomException
 from src.components.data_ingestion import Ingestion
-from src.utils.model_training_utils import train_model,loadmodel
 from src.components.data_preprocessing import Preprocessing
+from hyperopt import hp,fmin,tpe,STATUS_OK,Trials,space_eval
+from xgboost import XGBClassifier
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import accuracy_score , precision_score, fbeta_score, confusion_matrix
 
 @dataclass
 class Model_Training_files_dir():
@@ -16,7 +17,7 @@ class Model_Training_files_dir():
 
 
 class Model_Training():
-    def __init__(self, X, y, standar_scalar_dir, pca_dir, test_data):
+    def __init__(self, X, y, standar_scalar_dir, pca_dir, test_data,best_params):
         logging.info(f'{X.shape} {y.shape}')
         logging.info(f'{X}')
         self.X = X
@@ -24,15 +25,75 @@ class Model_Training():
         self.standar_scalar_dir = standar_scalar_dir
         self.pca_dir = pca_dir
         self.test_data = test_data
+        self.best_params = best_params
         self.dir = Model_Training_files_dir()
 
-    def start_training(self):
-        print('Model Training Initiated')
-        dir2 = train_model(self.X,self.y,self.dir.model_train_dir)
+    def objective(self,space):
+        model = XGBClassifier(
+            learning_rate = space['learning_rate'],
+            max_depth = space['max_depth'],
+            min_child_weight = space['min_child_weight'],
+            subsample = space['subsample'],
+            gamma = space['gamma'],
+            colsample_bytree = space['colsample_bytree'],
+            n_estimators = space['n_estimators']
+        )
+        accuracy = cross_val_score(model, self.X, self.y, cv = 5).mean()
 
-        print('Model Training Completed')
+        # We aim to maximize accuracy, therefore we return it as a negative value
+        return {'accuracy': accuracy, 'status': STATUS_OK }
 
-        # Test Data Load and Processing
+    def start_hyperparameter_tunning(self):
+        space = {
+            'learning_rate': hp.uniform('learning_rate', 0.01, 0.3),
+            'max_depth': hp.choice('max_depth', range(3, 15)),
+            'min_child_weight': hp.quniform('min_child_weight', 1, 10, 1),
+            'subsample': hp.uniform('subsample', 0.5, 1),
+            'gamma': hp.uniform('gamma', 0, 1),
+            'colsample_bytree': hp.uniform('colsample_bytree', 0.5, 1),
+            'n_estimators': hp.choice('n_estimators', range(50, 500)),
+        }
+        trials = Trials()
+        best = fmin(fn= self.objective,space= space,algo= tpe.suggest, max_evals = 80,trials= trials)
+        # Retrieve the best parameters
+        best_params = space_eval(space, best)
+        logging.info(f"Best Hyperparameters:{best_params}")
+        print("Best Hyperparameters:")
+        print(best_params)
+        return best_params
+
+    def start_training(self,best_params):
+        if best_params:
+            self.best_params = best_params
+        else:
+            self.best_params = self.start_hyperparameter_tunning()
+    
+        xgb_hyp = XGBClassifier(
+            learning_rate=self.best_params['learning_rate'],
+            n_estimators =self.best_params['n_estimators'],
+            max_depth=self.best_params['max_depth'],
+            min_child_weight=self.best_params['min_child_weight'],
+            subsample=self.best_params['subsample'],
+            colsample_bytree=self.best_params['colsample_bytree']
+        )
+
+        xgb_hyp.fit(self.X, self.y)
+        joblib.dump(xgb_hyp,self.dir.model_train_dir)
+
+        # Evaluate the performance of the XGBoost classifier
+        y_pred_xgb_hyp = xgb_hyp.predict(self.X)
+        accuracy = accuracy_score(self.y,y_pred_xgb_hyp)
+        precision = precision_score(self.y, y_pred_xgb_hyp)
+        conf_matrix = confusion_matrix(self.y, y_pred_xgb_hyp)
+        recall = conf_matrix[1, 1] / (conf_matrix[1, 1] + conf_matrix[1, 0])
+        f2_score = fbeta_score(self.y, y_pred_xgb_hyp, beta=2)
+        print('Trainind Data')
+        print('Accuracy of XGBClassifier using HyperOPT:', accuracy)
+        print(f'Precision: {precision}')
+        print(f'Recall: {recall}')
+        print(f'F2 Score: {f2_score}')
+
+        #Test Data 
         xt, yt = data_split(self.test_data)
         print(f'Test Data Loaded Successfully')
 
@@ -45,11 +106,17 @@ class Model_Training():
         print(f'Standardization Model loaded Successfully')
         xt = scaler.transform(xt)
 
-        # Load tpot model
-        tpot = joblib.load(dir2)
-
-        accuracy = tpot.score(xt, yt)
-        print(f"Test Accuracy: {accuracy}")
+        y_pred_test = xgb_hyp.predict(xt)
+        test_acc = accuracy_score(yt, y_pred_test)
+        precision = precision_score(yt, y_pred_test)
+        conf_matrix = confusion_matrix(yt, y_pred_test)
+        recall = conf_matrix[1, 1] / (conf_matrix[1, 1] + conf_matrix[1, 0])
+        f2_score = fbeta_score(yt, y_pred_test, beta=2)
+        print('Testing Data')
+        print('Accuracy of XGBClassifier using HyperOPT:', test_acc)
+        print(f'Precision: {precision}')
+        print(f'Recall: {recall}')
+        print(f'F2 Score: {f2_score}')
 
         return self.dir.model_train_dir 
     

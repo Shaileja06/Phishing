@@ -29,17 +29,7 @@ class Train_Pipeline():
     model_training_process = Model_Training(data['X'], data['y'], data['standar_scalar_dir'], data['pca_dir'], dir['test_data'])
     model_dir = model_training_process.start_training()
 
-    # Create a pipeline with the above processes
-    phishing_detection_pipeline = Pipeline([
-        ('ingestion', Ingestion('/content/Phishing/data/dataset_full.csv')),
-        ('preprocessing', Preprocessing(dir['train_data'], dir['test_data'])),
-        ('model_training', Model_Training(data['X'], data['y'], data['standar_scalar_dir'], data['pca_dir'], dir['test_data']))
-    ])
-
-    # Fit and transform the pipeline
-    phishing_detection_pipeline.fit_transform()
-    joblib.dump(phishing_detection_pipeline,self.dir.pipeline_dir)
-    return self.dir.pipeline_dir
+    return model_dir
 
 if __name__ == "__main__":
     # Create an instance of Train_Pipeline

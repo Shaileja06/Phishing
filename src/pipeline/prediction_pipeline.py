@@ -1,52 +1,191 @@
-from sklearn.pipeline import Pipeline
-from dataclasses import dataclass
-import os
-from src.components.data_ingestion import Ingestion
-from src.components.data_preprocessing import Preprocessing
-from src.components.model_trainer import Model_Training
+import numpy as np
+from urllib.parse import urlparse, parse_qs
 import joblib
+import socket
 
-@dataclass
-class Pipeline_dir():
-    os.makedirs('artifacts/pipe',exist_ok=True)
-    pipeline_dir = 'artifacts/pipeline/model.joblib'
+def is_ip_address(domain):
+    try:
+        socket.inet_aton(domain)
+        return True
+    except socket.error:
+        return False
 
+def extract_additional_url_features(url):
+    parsed_url = urlparse(url)
 
-class Train_Pipeline():
-  def __init__(self):
-    self.dir = Pipeline_dir()
+    return {
+        'qty_dot_url': url.count('.'),
+        'qty_hyphen_url': url.count('-'),
+        'qty_underline_url': url.count('_'),
+        'qty_slash_url': url.count('/'),
+        'qty_questionmark_url': url.count('?'),
+        'qty_equal_url': url.count('='),
+        'qty_at_url': url.count('@'),
+        'qty_exclamation_url': url.count('!'),
+        'qty_space_url': url.count(' '),
+        'qty_tilde_url': url.count('~'),
+        'qty_comma_url': url.count(','),
+        'qty_plus_url': url.count('+'),
+        'qty_asterisk_url': url.count('*'),
+        'qty_hashtag_url': url.count('#'),
+        'qty_dollar_url': url.count('$'),
+        'qty_percent_url': url.count('%'),
+        'qty_tld_url': len(parsed_url.netloc.split('.')[-1]), 
+        'length_url': len(url)
+    }
 
-  def start_training_pipeline(self):
-    # Step 1: Ingestion
-    ingestion_process = Ingestion('/content/Phishing/data/dataset_full.csv')
-    dir = ingestion_process.ingestion()
+def extract_additional_domain_features(url):
+    # Parse the URL to get the domain
+    domain = urlparse(url).netloc
 
-    # Step 2: Preprocessing
-    preprocess_process = Preprocessing(dir['train_data'], dir['test_data']) 
-    data = preprocess_process.preprocessing()
+    if not domain:
+        return {
+            'qty_dot_domain': -1,
+            'qty_hyphen_domain': -1,
+            'qty_underline_domain': -1,
+            'qty_at_domain': -1,
+            'qty_vowels_domain': -1,
+            'domain_in_ip': -1,
+            'server_client_domain': -1
+        }
 
-    # Step 3: Model Training
-    model_training_process = Model_Training(data['X'], data['y'], data['standar_scalar_dir'], data['pca_dir'], dir['test_data'])
-    model_dir = model_training_process.start_training()
+    return {
+        'qty_dot_domain': domain.count('.'),
+        'qty_hyphen_domain': domain.count('-'),
+        'qty_underline_domain': domain.count('_'),
+        'qty_at_domain': domain.count('@'),
+        'qty_vowels_domain': sum(1 for char in domain if char.lower() in "aeiou"),
+        'domain_in_ip': 1 if is_ip_address(domain) else 0,
+        'server_client_domain': 1 if domain.startswith("www.") else 0
+    }
 
-    # Create a pipeline with the above processes
-    phishing_detection_pipeline = Pipeline([
-        ('ingestion', Ingestion('/content/Phishing/data/dataset_full.csv')),
-        ('preprocessing', Preprocessing(dir['train_data'], dir['test_data'])),
-        ('model_training', Model_Training(data['X'], data['y'], data['standar_scalar_dir'], data['pca_dir'], dir['test_data']))
-    ])
+def extract_additional_path_features(url):
+    # Parse the URL to get the path
+    path = urlparse(url).path
 
-    # Fit and transform the pipeline
-    phishing_detection_pipeline.fit_transform()
-    joblib.dump(phishing_detection_pipeline,self.dir.pipeline_dir)
-    return self.dir.pipeline_dir
+    if not path:
+        return {
+            'qty_dot_directory': -1,
+            'qty_hyphen_directory': -1,
+            'qty_underline_directory': -1,
+            'qty_percent_directory': -1,
+            'directory_length': -1
+        }
 
-if __name__ == "__main__":
-    # Create an instance of Train_Pipeline
-    train_pipeline_instance = Train_Pipeline()
+    return {
+        'qty_dot_directory': path.count('.'),
+        'qty_hyphen_directory': path.count('-'),
+        'qty_underline_directory': path.count('_'),
+        'qty_percent_directory': path.count('%'),
+        'directory_length': len(path)
+    }
 
-    # Start the training pipeline
-    pipeline_dir = train_pipeline_instance.start_training_pipeline()
+def extract_file_features(url):
+    # Parse the URL to get the path
+    path = urlparse(url).path
 
-    print(f"Pipeline trained and saved to: {pipeline_dir}")
+    if not path:
+        return {
+            'file_length': -1
+        }
 
+    # Extract the file name from the path
+    file_name = path.split('/')[-1]
+
+    # Attribute: Length of the file name
+    file_length = len(file_name)
+
+    return {
+        'file_length': file_length
+    }
+
+def extract_additional_params_features(url):
+    # Parse the URL to get the query parameters
+    query_params = urlparse(url).query
+
+    if not query_params:
+        return {
+            'qty_dot_params': -1,
+            'qty_hyphen_params': -1,
+            'qty_underline_params': -1,
+            'qty_slash_params': -1,
+            'qty_questionmark_params': -1,
+            'qty_percent_params': -1
+        }
+
+    # Extract parameter names from the query string
+    param_names = parse_qs(query_params).keys()
+
+    return {
+        'qty_dot_params': sum(param.count('.') for param in param_names),
+        'qty_hyphen_params': sum(param.count('-') for param in param_names),
+        'qty_underline_params': sum(param.count('_') for param in param_names),
+        'qty_slash_params': sum(param.count('/') for param in param_names),
+        'qty_questionmark_params': sum(param.count('?') for param in param_names),
+        'qty_percent_params': sum(param.count('%') for param in param_names)
+    }
+
+def email_urlshorten(url):
+    # Parse the URL
+    parsed_url = urlparse(url)
+
+    # Extract the domain from the URL
+    domain = parsed_url.netloc
+
+    if not domain:
+        return {
+            'email_in_url': -1,
+            'tls_ssl_certificate' : -1,
+            'url_shortened': -1
+        }
+
+    return {
+        'email_in_url': 1 if '@' in url else 0,
+        'tls_ssl_certificate' : 1 if url.startswith("https://") else 0,
+        'url_shortened': 1 if domain in ['bit.ly', 'goo.gl', 'tinyurl.com', 'ow.ly'] else 0
+    }
+
+def extract_all_features(url):
+    # Extract URL-based features
+    url_features = extract_additional_url_features(url)
+
+    # Extract Domain-based features
+    domain_features = extract_additional_domain_features(url)
+
+    # Extract Page-based features
+    path_features = extract_additional_path_features(url)
+
+    # Extract File-based feature
+    file_feature = extract_file_features(url)
+
+    # Extract Params-based features
+    params_features = extract_additional_params_features(url)
+
+    # Extract Additional Features
+    additional_features = email_urlshorten(url)
+
+    # Combine all features
+    all_features = {**url_features, **domain_features, **path_features, **file_feature, **params_features, **additional_features}
+
+    return all_features
+
+def prediction(extracted_features):
+    #loaded_pipeline = joblib.load('/content/tpot_xgbclassifier_pipeline.joblib')
+    print(extracted_features.values(),len(extracted_features.values()))
+    data = np.array(list(extracted_features.values())).reshape(1, -1)
+
+    # Assuming you have a PCA object
+    pca = joblib.load('artifacts\components\pca.joblib')
+    pca_transformed_data = pca.transform(data)
+
+    # Assuming you have a scaler object
+    scaler = joblib.load('artifacts\components\standard.joblib')
+    scaled_data = scaler.transform(pca_transformed_data)
+
+    # Use the trained XGBBoost for prediction
+    #prediction = loaded_pipeline.predict(pca_transformed_data)
+    tpot = joblib.load('artifacts\model\model.joblib')
+    prediction = tpot.predict(scaled_data)
+
+    print(prediction)
+    return prediction

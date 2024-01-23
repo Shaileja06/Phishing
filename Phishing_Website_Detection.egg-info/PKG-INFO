@@ -12,5 +12,5 @@ Requires-Dist: streamlit
 Requires-Dist: xgboost
 Requires-Dist: tensorflow
 Requires-Dist: torch
-Requires-Dist: tpot
+Requires-Dist: hyperopt
 Requires-Dist: imblearn

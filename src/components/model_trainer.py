@@ -39,7 +39,7 @@ class Model_Training():
         accuracy = cross_val_score(model, self.X, self.y, cv = 5).mean()
 
         # We aim to maximize accuracy, therefore we return it as a negative value
-        return {'accuracy': accuracy, 'status': STATUS_OK }
+        return {'loss': 1-accuracy, 'status': STATUS_OK }
 
     def start_hyperparameter_tunning(self):
         space = {
@@ -60,8 +60,8 @@ class Model_Training():
         print(best_params)
         return best_params
 
-    def start_training(self,best_params):
-        if best_params:
+    def start_training(self, best_params=None):
+        if best_params is not None:
             self.best_params = best_params
         else:
             self.best_params = self.start_hyperparameter_tunning()

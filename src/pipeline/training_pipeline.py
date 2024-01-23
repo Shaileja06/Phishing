@@ -27,7 +27,8 @@ class Train_Pipeline():
 
     # Step 3: Model Training
     model_training_process = Model_Training(data['X'], data['y'], data['standar_scalar_dir'], data['pca_dir'], dir['test_data'])
-    model_dir = model_training_process.start_training()
+    best_params = {'colsample_bytree': 0.885851504127611, 'gamma': 0.6411482852494903, 'learning_rate': 0.034930371583044684, 'max_depth': 3, 'min_child_weight': 8.0, 'n_estimators': 83, 'subsample': 0.9191185596390956}
+    model_dir = model_training_process.start_training(best_params)
 
     return model_dir
 

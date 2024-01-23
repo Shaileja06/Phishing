@@ -12,7 +12,10 @@ def main():
         if url:
             extracted_features = extract_all_features(url)
             result = prediction(extracted_features)
-            st.success(result)
+            if result == [0]:
+                st.success("The URL is not phished.")
+            else:
+                st.warning("The URL is phished.")
         else:
             st.warning("Please enter a feature name.")
 

@@ -17,9 +17,7 @@ class Model_Training_files_dir():
 
 
 class Model_Training():
-    def __init__(self, X, y, standar_scalar_dir, pca_dir, test_data,best_params):
-        logging.info(f'{X.shape} {y.shape}')
-        logging.info(f'{X}')
+    def __init__(self, X, y, standar_scalar_dir, pca_dir, test_data,best_params=None):
         self.X = X
         self.y = y 
         self.standar_scalar_dir = standar_scalar_dir

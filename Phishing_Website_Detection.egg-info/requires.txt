@@ -4,7 +4,5 @@ python-whois
 scikit-learn
 streamlit
 xgboost
-tensorflow
-torch
 hyperopt
 imblearn

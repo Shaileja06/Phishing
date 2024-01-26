@@ -5,20 +5,14 @@ from src.components.data_ingestion import Ingestion
 from src.components.data_preprocessing import Preprocessing
 from src.components.model_trainer import Model_Training
 import joblib
-
-@dataclass
-class Pipeline_dir():
-    os.makedirs('artifacts/pipe',exist_ok=True)
-    pipeline_dir = 'artifacts/pipeline/model.joblib'
-
+from src.logger import logging
+from sklearn.metrics import accuracy_score,precision_score, fbeta_score, confusion_matrix
+import pandas as pd
 
 class Train_Pipeline():
-  def __init__(self):
-    self.dir = Pipeline_dir()
-
   def start_training_pipeline(self):
     # Step 1: Ingestion
-    ingestion_process = Ingestion('/content/Phishing/data/dataset_full.csv')
+    ingestion_process = Ingestion('data\dataset_full.csv')
     dir = ingestion_process.ingestion()
 
     # Step 2: Preprocessing
@@ -38,6 +32,5 @@ if __name__ == "__main__":
 
     # Start the training pipeline
     pipeline_dir = train_pipeline_instance.start_training_pipeline()
-
     print(f"Pipeline trained and saved to: {pipeline_dir}")
 

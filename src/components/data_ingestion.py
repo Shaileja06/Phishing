@@ -28,12 +28,12 @@ class Ingestion():
         X = df.drop(columns='phishing',axis=1)
         y = df['phishing']
 
-        smote = SMOTE(sampling_strategy='all', k_neighbors=5)
+        smote = SMOTE(sampling_strategy='all', k_neighbors=2)
         X, y = smote.fit_resample(X,y)
 
         df = concat_x_y(X,y)
         logging.info(f"Smoting Completed Succesfully The Value counts are {df['phishing'].value_counts()}")
-        print(f"Smoting Completed Succesfully The Vale counts are {df['phishing'].value_counts()}")
+        #print(f"Smoting Completed Succesfully The Vale counts are {df['phishing'].value_counts()}")
         df.to_csv(self.dir.cleaned_data,index=False)
 
         logging.info(f'Clean Data Saved to {self.dir.cleaned_data}')

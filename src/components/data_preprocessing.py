@@ -28,7 +28,7 @@ class Preprocessing():
         X,y = data_split(self.train_data)
 
         # PCA of the features
-        pca = PCA(n_components=10)
+        pca = PCA(n_components=5)
         X = pca.fit_transform(X)
         with open(self.dir.pca_dir,'wb') as f:
             joblib.dump(pca,f)

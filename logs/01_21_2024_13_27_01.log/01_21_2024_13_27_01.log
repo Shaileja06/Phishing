@@ -1,8 +1,0 @@
-[ 2024-01-21 13:27:01,667 ] 160 numexpr.utils - INFO - NumExpr defaulting to 2 threads.
-[ 2024-01-21 13:27:03,453 ] 22 root - INFO - Data Read Succesfully from /content/Phishing/data/dataset_full.csv
-[ 2024-01-21 13:27:03,453 ] 23 root - INFO - Initiating Data Ingestion Method
-[ 2024-01-21 13:27:05,922 ] 26 root - INFO - Data Ingestion Method Completed
-[ 2024-01-21 13:27:06,450 ] 29 root - INFO - Clean Data Saved to artifacts/cleaned_data/final_data.csv
-[ 2024-01-21 13:27:06,906 ] 37 root - INFO - Training Dataset Saved at artifacts/cleaned_data/train_data.csv
-[ 2024-01-21 13:27:07,048 ] 41 root - INFO - Testing Dataset Saved at artifacts/cleaned_data/test_data.csv
-[ 2024-01-21 13:27:07,048 ] 42 root - INFO - Completed Data Ingestion Method

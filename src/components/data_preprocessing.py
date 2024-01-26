@@ -6,9 +6,6 @@ from dataclasses import dataclass
 #from src.utils.ingestion_utils import concat_x_y
 from src.utils.preprocessing_utils import data_split
 from src.logger import logging
-from src.exception import CustomException
-from src.components.data_ingestion import Ingestion
-import pandas as pd
 
 @dataclass
 class Preprocessing_files_dir():
@@ -17,9 +14,11 @@ class Preprocessing_files_dir():
     pca_dir = 'artifacts/components/pca.joblib'
 
 class Preprocessing():
-    def __init__(self,train_data,test_data):
+    def __init__(self,cleaned_data,train_data,test_data,n_components):
+        self.cleaned_data = cleaned_data
         self.train_data = train_data
         self.test_data = test_data
+        self.n_components = n_components
         self.dir = Preprocessing_files_dir()
 
     def preprocessing(self):
@@ -28,7 +27,7 @@ class Preprocessing():
         X,y = data_split(self.train_data)
 
         # PCA of the features
-        pca = PCA(n_components=5)
+        pca = PCA(n_components=self.n_components)
         X = pca.fit_transform(X)
         with open(self.dir.pca_dir,'wb') as f:
             joblib.dump(pca,f)

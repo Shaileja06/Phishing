@@ -14,11 +14,12 @@ class Ingestion_files_dir():
     test_data = 'artifacts/cleaned_data/test_data.csv'
 
 class Ingestion():
-    def __init__(self, file='/content/Phishing/data/dataset_full.csv'):
+    def __init__(self,file,k_neighbors):
         self.file = file
+        self.k_neighbors = k_neighbors
         self.dir = Ingestion_files_dir()
 
-    def ingestion(self):
+    def start_ingestion(self):
         df = pd.read_csv(self.file)
         logging.info(f'Data Read Succesfully from {self.file}')
         logging.info('Initiating Data Ingestion Method')
@@ -28,7 +29,7 @@ class Ingestion():
         X = df.drop(columns='phishing',axis=1)
         y = df['phishing']
 
-        smote = SMOTE(sampling_strategy='all', k_neighbors=2)
+        smote = SMOTE(sampling_strategy='all', k_neighbors=int(self.k_neighbors))
         X, y = smote.fit_resample(X,y)
 
         df = concat_x_y(X,y)

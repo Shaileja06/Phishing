@@ -2,17 +2,53 @@ from dataclasses import dataclass
 import os
 import joblib
 from src.logger import logging
-from src.components.data_ingestion import Ingestion
-from src.components.data_preprocessing import Preprocessing
 from hyperopt import hp,fmin,tpe,STATUS_OK,Trials,space_eval
 from xgboost import XGBClassifier
 from sklearn.model_selection import cross_val_score
-from sklearn.metrics import accuracy_score , precision_score, fbeta_score, confusion_matrix
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import SMOTE
-import pandas as pd
 from src.utils.model_trainer_utils import start_validating_data,evalulate_train_data,evalulate_test_data
+import pandas as pd
+from src.utils.ingestion_utils import DataCleaning
+
+def objective_with_smote_pca(space):
+        
+    df = pd.read_csv('data\dataset_full.csv')
+    logging.info(f'Data Read Succesfully from data\dataset_full.csv')
+    logging.info('Initiating Data Ingestion Method')
+    clean = DataCleaning(df, 0.8, 0.8)
+    df = clean.feature_scaling_df()
+
+    X = df.drop(columns='phishing',axis=1)
+    y = df['phishing']
+
+    i = int(space['k_neighbour'])
+    j = int(space['n_components'])
+
+    smote = SMOTE(sampling_strategy='all')
+    smote_x, smote_y = smote.fit_resample(X,y)
+
+    pca = PCA(n_components=j)
+    pca_x = pca.fit_transform(smote_x)
+
+    scaler = StandardScaler()
+    standard_x = scaler.fit_transform(pca_x)
+
+    model = XGBClassifier(
+        learning_rate=space['learning_rate'],
+        max_depth=space['max_depth'],
+        min_child_weight=space['min_child_weight'],
+        subsample=space['subsample'],
+        gamma=space['gamma'],
+        colsample_bytree=space['colsample_bytree'],
+        n_estimators=space['n_estimators']
+    )
+    accuracy = cross_val_score(model, standard_x, smote_y, cv=5).mean()
+
+    # We aim to maximize accuracy, therefore we return it as a negative value
+    return {'loss': 1 - accuracy, 'status': STATUS_OK}
+
 
 @dataclass
 class Model_Training_files_dir():
@@ -21,42 +57,12 @@ class Model_Training_files_dir():
 
 
 class Model_Training():
-    def __init__(self, X=None, y=None,standar_scalar_dir =None, pca_dir =None, test_data =None,best_params=None):
+    def __init__(self, X=None, y=None,test_data =None,cleaned_data = None):
         self.X = X
         self.y = y 
-        self.standar_scalar_dir = standar_scalar_dir
-        self.pca_dir = pca_dir
         self.test_data = test_data
-        self.best_params = best_params
-        #self.clean_dir = clean_dir
+        self.cleaned_data= cleaned_data
         self.dir = Model_Training_files_dir()
-    
-    def objective_with_smote_pca(self,space):
-        i = int(space['k_neighbour'])
-        j = int(space['n_components'])
-
-        smote = SMOTE(sampling_strategy='all', k_neighbors=i)
-        smote_x, smote_y = smote.fit_resample(self.X, self.y)
-
-        pca = PCA(n_components=j)
-        pca_x = pca.fit_transform(smote_x)
-
-        scaler = StandardScaler()
-        standard_x = scaler.fit_transform(pca_x)
-
-        model = XGBClassifier(
-            learning_rate=space['learning_rate'],
-            max_depth=space['max_depth'],
-            min_child_weight=space['min_child_weight'],
-            subsample=space['subsample'],
-            gamma=space['gamma'],
-            colsample_bytree=space['colsample_bytree'],
-            n_estimators=space['n_estimators']
-        )
-        accuracy = cross_val_score(model, standard_x, smote_y, cv=5).mean()
-
-        # We aim to maximize accuracy, therefore we return it as a negative value
-        return {'loss': 1 - accuracy, 'status': STATUS_OK}
 
 
     def start_hyperparameter_tunning(self):
@@ -74,7 +80,7 @@ class Model_Training():
         }
 
         trials = Trials()
-        best = fmin(fn=self.objective_with_smote_pca,
+        best = fmin(fn=objective_with_smote_pca,
                     space=space,
                     algo=tpe.suggest,
                     max_evals=80,
@@ -85,19 +91,15 @@ class Model_Training():
         logging.info(f"Best Hyperparameters: {best_params}")
         return best_params
     
-    def start_training(self, best_params=None):
-        if best_params is not None:
-            self.best_params = best_params
-        else:
-            self.best_params = self.start_hyperparameter_tunning()
+    def start_training(self, best_params):
         
         xgb_hyp = XGBClassifier(
-                learning_rate=self.best_params['learning_rate'],
-                n_estimators =self.best_params['n_estimators'],
-                max_depth=self.best_params['max_depth'],
-                min_child_weight=self.best_params['min_child_weight'],
-                subsample=self.best_params['subsample'],
-                colsample_bytree=self.best_params['colsample_bytree']
+                learning_rate=best_params['learning_rate'],
+                n_estimators =best_params['n_estimators'],
+                max_depth=best_params['max_depth'],
+                min_child_weight=best_params['min_child_weight'],
+                subsample=best_params['subsample'],
+                colsample_bytree=best_params['colsample_bytree']
             )
 
         xgb_hyp.fit(self.X, self.y)

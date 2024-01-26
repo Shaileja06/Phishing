@@ -46,7 +46,7 @@ def evalulate_test_data(test_data,xgb_hyp):
     logging.info(f'F2 Score: {f2_score}')
 
 def start_validating_data():
-    df3 = pd.read_csv('\content\Phishing\data\dataset_small.csv')
+    df3 = pd.read_csv('data\dataset_small.csv')
     df3 = df3[list(pd.read_csv('artifacts/cleaned_data/train_data.csv').columns)]
     X2 = df3.drop(columns='phishing',axis=1)
     Y2 = df3['phishing']

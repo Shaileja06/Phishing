@@ -47,22 +47,3 @@ class Preprocessing():
             'standar_scalar_dir':self.dir.standar_scalar_dir,
             'pca_dir':self.dir.pca_dir
         }
-
-
-if __name__=='__main__':
-    ingestion_process = Ingestion('/content/Phishing/data/dataset_full.csv')
-    dir = ingestion_process.ingestion()
-    print(dir['cleaned_data'])
-    print(dir['train_data'])
-    print(dir['test_data'])    
-
-    preprocess_process = Preprocessing(dir['train_data'],dir['test_data']) 
-    data = preprocess_process.preprocessing()
-    print(data['standar_scalar_dir'])
-    print(data['pca_dir'])
-    print(data['X'])
-    print(data['y'])
-
-    #print(data['X'].shape,data['y'].shape,len(data['y']))
-
-

@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 import os
 import joblib
-from src.utils.preprocessing_utils import data_split
 from src.logger import logging
 from src.components.data_ingestion import Ingestion
 from src.components.data_preprocessing import Preprocessing
@@ -13,6 +12,7 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from imblearn.over_sampling import SMOTE
 import pandas as pd
+from src.utils.model_trainer_utils import start_validating_data,evalulate_train_data,evalulate_test_data
 
 @dataclass
 class Model_Training_files_dir():
@@ -21,21 +21,22 @@ class Model_Training_files_dir():
 
 
 class Model_Training():
-    def __init__(self, X, y, standar_scalar_dir, pca_dir, test_data,best_params=None):
+    def __init__(self, X=None, y=None,standar_scalar_dir =None, pca_dir =None, test_data =None,best_params=None):
         self.X = X
         self.y = y 
         self.standar_scalar_dir = standar_scalar_dir
         self.pca_dir = pca_dir
         self.test_data = test_data
         self.best_params = best_params
+        #self.clean_dir = clean_dir
         self.dir = Model_Training_files_dir()
-
-    def objective_with_smote_pca(space):
+    
+    def objective_with_smote_pca(self,space):
         i = int(space['k_neighbour'])
         j = int(space['n_components'])
 
         smote = SMOTE(sampling_strategy='all', k_neighbors=i)
-        smote_x, smote_y = smote.fit_resample(X, y)
+        smote_x, smote_y = smote.fit_resample(self.X, self.y)
 
         pca = PCA(n_components=j)
         pca_x = pca.fit_transform(smote_x)
@@ -58,7 +59,8 @@ class Model_Training():
         return {'loss': 1 - accuracy, 'status': STATUS_OK}
 
 
-    def hypertune(self,X, y):
+    def start_hyperparameter_tunning(self):
+
         space = {
             'learning_rate': hp.uniform('learning_rate', 0.01, 0.3),
             'max_depth': hp.choice('max_depth', range(3, 15)),
@@ -80,6 +82,7 @@ class Model_Training():
         best_params = space_eval(space, best)
         print("Best Hyperparameters:")
         print(best_params)
+        logging.info(f"Best Hyperparameters: {best_params}")
         return best_params
     
     def start_training(self, best_params=None):
@@ -100,83 +103,11 @@ class Model_Training():
         xgb_hyp.fit(self.X, self.y)
         joblib.dump(xgb_hyp,self.dir.model_train_dir)
 
-        # Evaluate the performance of the XGBoost classifier
-        y_pred_xgb_hyp = xgb_hyp.predict(self.X)
-        accuracy = accuracy_score(self.y,y_pred_xgb_hyp)
-        precision = precision_score(self.y, y_pred_xgb_hyp)
-        conf_matrix = confusion_matrix(self.y, y_pred_xgb_hyp)
-        recall = conf_matrix[1, 1] / (conf_matrix[1, 1] + conf_matrix[1, 0])
-        f2_score = fbeta_score(self.y, y_pred_xgb_hyp, beta=2)
-        logging.info('Trainind Data')
-        logging.info(f'Accuracy of XGBClassifier using HyperOPT: {accuracy}')
-        logging.info(f'Precision: {precision}')
-        logging.info(f'Recall: {recall}')
-        logging.info(f'F2 Score: {f2_score}')
+        evalulate_train_data(self.X,self.y,xgb_hyp)
 
-        #Test Data 
-        xt, yt = data_split(self.test_data)
-        logging.info(f'Test Data Loaded Successfully')
+        evalulate_test_data(self.test_data,xgb_hyp)
 
-        # Load scaler and pca models
-        pca = joblib.load(self.pca_dir)
-        logging.info(f'PCA Model loaded Successfully')
-        xt = pca.transform(xt)
-
-        scaler = joblib.load(self.standar_scalar_dir)
-        logging.info(f'Standardization Model loaded Successfully')
-        xt = scaler.transform(xt)
-
-        y_pred_test = xgb_hyp.predict(xt)
-        test_acc = accuracy_score(yt, y_pred_test)
-        precision = precision_score(yt, y_pred_test)
-        conf_matrix = confusion_matrix(yt, y_pred_test)
-        recall = conf_matrix[1, 1] / (conf_matrix[1, 1] + conf_matrix[1, 0])
-        f2_score = fbeta_score(yt, y_pred_test, beta=2)
-        logging.info('Testing Data')
-        logging.info(f'Accuracy of XGBClassifier using HyperOPT: {test_acc}')
-        logging.info(f'Precision: {precision}')
-        logging.info(f'Recall: {recall}')
-        logging.info(f'F2 Score: {f2_score}')
-
-        df3 = pd.read_csv('data\dataset_small.csv')
-        df3 = df3[list(pd.read_csv('artifacts/cleaned_data/train_data.csv').columns)]
-        X2 = df3.drop(columns='phishing',axis=1)
-        Y2 = df3['phishing']
-        pca = joblib.load('artifacts\components\pca.joblib')
-        X2 = pca.fit_transform(X2)
-        scaler = joblib.load('artifacts\components\standard.joblib')
-        X2 = scaler.transform(X2)
-        xgb_hyp = joblib.load('artifacts\model\model.joblib')
-        ypred2 = xgb_hyp.predict(X2)
-        accuracy = accuracy_score(Y2,ypred2)
-        y_true = Y2
-        y_pred = ypred2
-
-        # Assuming y_true contains the true labels and y_pred contains the predicted labels
-        precision = precision_score(y_true, y_pred)
-        conf_matrix = confusion_matrix(y_true, y_pred)
-        recall = conf_matrix[1, 1] / (conf_matrix[1, 1] + conf_matrix[1, 0])
-        f2_score = fbeta_score(y_true, y_pred, beta=2)
-        logging.info('Validate Dataset')
-        logging.info(f'Accuracy: {accuracy}')
-        logging.info(f'Precision: {precision}')
-        logging.info(f'Recall: {recall}')
-        logging.info(f'F2 Score: {f2_score}')
+        start_validating_data()
 
         return self.dir.model_train_dir 
-        
-if __name__=='__main__':
-    ingestion_process = Ingestion('/content/Phishing/data/dataset_full.csv')
-    dir = ingestion_process.ingestion()
-    print(dir['cleaned_data'])
-    print(dir['train_data'])
-    print(dir['test_data'])    
-
-    preprocess_process = Preprocessing(dir['train_data'],dir['test_data']) 
-    data = preprocess_process.preprocessing()
-    print(data['standar_scalar_dir'])
-    print(data['pca_dir'])
-
-    model_training_process = Model_Training(data['X'],data['y'],data['standar_scalar_dir'],data['pca_dir'],dir['test_data'])
-    model_dir = model_training_process.start_training()
-    print(model_dir)
+    

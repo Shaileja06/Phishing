@@ -52,10 +52,3 @@ class Ingestion():
             'train_data' : self.dir.train_data,
             'test_data' : self.dir.test_data
         }
-                
-if __name__=='__main__':
-    ingestion_process = Ingestion('/content/Phishing/data/dataset_full.csv')
-    dir = ingestion_process.ingestion()
-    print(dir['cleaned_data'])
-    print(dir['train_data'])
-    print(dir['test_data'])

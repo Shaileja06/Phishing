@@ -17,7 +17,7 @@ The `train_pipeline.py` file is the main component of the training pipeline for 
 1. Install the required libraries.
 
    ```python
-        pip install ir requirements.txt
+        pip install -r requirements.txt
    ```
 2. Run the following cammand fot Training
 

@@ -1,7 +1,7 @@
 from setuptools import setup,find_packages
 
 def install_other_pakage():
-    with open('requirements.txt','r') as f:
+    with open('C:/Users/LENOVO/Desktop/Phishing/Phishing/requirements.txt', 'r') as f:
         lines = f.readlines()
         packages = [i.replace('/n','') for i in lines if i != '-e .' and not i.startswith('#')]
         return packages

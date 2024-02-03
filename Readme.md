@@ -54,7 +54,7 @@ To use the prediction pipeline, simply call the `prediction()` function with a U
 prediction = prediction("https://www.example.com/page/file?param1=value1&param2=value2")
 ```
 
-# Datagestion
+# Data Ingestion
 The first step in the pipeline is data ingestion. This module is responsible for reading the raw data, cleaning it, and splitting it into training and testing sets. The data is ingested from a CSV file named dataset_full.csv.
 
 # Ingestion Class

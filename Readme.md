@@ -19,7 +19,7 @@ The `train_pipeline.py` file is the main component of the training pipeline for 
    ```python
         pip install -r requirements.txt
    ```
-2. Run the following cammand fot Training
+2. Run the following cammand for Training
 
     ```python
         python src/pipeline/train_pipeline.py
